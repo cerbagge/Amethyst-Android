@@ -75,7 +75,7 @@ public class LauncherPreferences {
     public static int PREF_TOUCHCONTROLLER_VIBRATE_LENGTH = 100;
 
     public static boolean PREF_MOUSE_GRAB_FORCE = false;
-    public static boolean PREF_HIDE_CONTROLS_HARDWARE = false;
+    public static boolean PREF_HIDE_CONTROLS_HARDWARE = true;
 
 
     public static void loadPreferences(Context ctx) {
@@ -122,7 +122,7 @@ public class LauncherPreferences {
         PREF_FORCE_ENABLE_TOUCHCONTROLLER = DEFAULT_PREF.getBoolean("forceEnableTouchController", false);
         PREF_TOUCHCONTROLLER_VIBRATE_LENGTH = DEFAULT_PREF.getInt("touchControllerVibrateLength", 100);
         PREF_MOUSE_GRAB_FORCE = DEFAULT_PREF.getBoolean("always_grab_mouse", false);
-        PREF_HIDE_CONTROLS_HARDWARE = DEFAULT_PREF.getBoolean("hide_controls_hardware", false);
+        PREF_HIDE_CONTROLS_HARDWARE = DEFAULT_PREF.getBoolean("hide_controls_hardware", true);
 
         String argLwjglLibname = "-Dorg.lwjgl.opengl.libname=";
         for (String arg : JREUtils.parseJavaArguments(PREF_CUSTOM_JAVA_ARGS)) {

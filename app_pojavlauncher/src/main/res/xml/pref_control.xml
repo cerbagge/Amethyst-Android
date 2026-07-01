@@ -105,7 +105,7 @@
             android:key="hide_controls_hardware"
             android:title="@string/mcl_setting_title_hide_controls_hardware"
             android:summary="@string/mcl_setting_subtitle_hide_controls_hardware"
-            android:defaultValue="false"/>
+            android:defaultValue="true"/>
     </PreferenceCategory>
 
     <PreferenceCategory
