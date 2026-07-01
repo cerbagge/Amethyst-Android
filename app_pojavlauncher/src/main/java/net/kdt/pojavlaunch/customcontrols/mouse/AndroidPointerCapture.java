@@ -5,6 +5,7 @@ import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_MOUSE_GRAB_FORC
 
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.Log;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
@@ -164,6 +165,8 @@ public class AndroidPointerCapture implements ViewTreeObserver.OnWindowFocusChan
             case MotionEvent.ACTION_MOVE:
                 return true;
             case MotionEvent.ACTION_BUTTON_PRESS:
+                Log.i("InputDebug", "Captured BUTTON_PRESS actionButton=" + event.getActionButton()
+                        + " meta=0x" + Integer.toHexString(event.getMetaState()));
                 return MinecraftGLSurface.sendMouseButtonUnconverted(event.getActionButton(), true);
             case MotionEvent.ACTION_BUTTON_RELEASE:
                 return MinecraftGLSurface.sendMouseButtonUnconverted(event.getActionButton(), false);

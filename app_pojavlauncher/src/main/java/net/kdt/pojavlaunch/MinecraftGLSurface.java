@@ -318,6 +318,16 @@ public class MinecraftGLSurface extends View implements GrabListener, DirectGame
         if(eventKeycode == KeyEvent.KEYCODE_UNKNOWN) return true;
         if(eventKeycode == KeyEvent.KEYCODE_VOLUME_DOWN) return false;
         if(eventKeycode == KeyEvent.KEYCODE_VOLUME_UP) return false;
+        // Android may synthesize KEYCODE_BACK when a mouse button is clicked while Shift is held.
+        // Without this guard it falls through to the keycode table (BACK -> GLFW_KEY_ESCAPE)
+        // and opens the in-game menu. Swallow it; the click itself arrives as a MotionEvent.
+        if(eventKeycode == KeyEvent.KEYCODE_BACK) {
+            Log.i("InputDebug", "KEYCODE_BACK: action=" + event.getAction()
+                    + " source=0x" + Integer.toHexString(event.getSource())
+                    + " meta=0x" + Integer.toHexString(event.getMetaState())
+                    + " device=" + (event.getDevice() == null ? "null" : event.getDevice().getName()));
+            if(event.isShiftPressed()) return true;
+        }
         if(event.getRepeatCount() != 0) return true;
         int action = event.getAction();
         if(action == KeyEvent.ACTION_MULTIPLE) return true;
