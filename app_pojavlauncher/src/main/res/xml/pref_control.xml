@@ -101,6 +101,11 @@
             android:title="@string/mcl_setting_title_grab_mouse"
             android:summary="@string/mcl_setting_subtitle_grab_mouse"
             android:defaultValue="false"/>
+        <SwitchPreference
+            android:key="hide_controls_hardware"
+            android:title="@string/mcl_setting_title_hide_controls_hardware"
+            android:summary="@string/mcl_setting_subtitle_hide_controls_hardware"
+            android:defaultValue="false"/>
     </PreferenceCategory>
 
     <PreferenceCategory

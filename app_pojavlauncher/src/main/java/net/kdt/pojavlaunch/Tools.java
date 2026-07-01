@@ -1904,6 +1904,21 @@ public final class Tools {
         return false;
     }
 
+    public static boolean isHardwareInputConnected() {
+        for (int id : InputDevice.getDeviceIds()) {
+            InputDevice device = InputDevice.getDevice(id);
+            if (device == null || device.isVirtual()) continue;
+            int sources = device.getSources();
+            boolean isMouse = (sources & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE
+                    || (sources & InputDevice.SOURCE_MOUSE_RELATIVE) == InputDevice.SOURCE_MOUSE_RELATIVE
+                    || (sources & InputDevice.SOURCE_TRACKBALL) == InputDevice.SOURCE_TRACKBALL;
+            boolean isKeyboard = (sources & InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD
+                    && device.getKeyboardType() == InputDevice.KEYBOARD_TYPE_ALPHABETIC;
+            if (isMouse || isKeyboard) return true;
+        }
+        return false;
+    }
+
     public static Object runMethodbyReflection(String className, String methodName) throws ReflectiveOperationException{
         Class<?> clazz = Class.forName(className);
         Method method = clazz.getDeclaredMethod(methodName);

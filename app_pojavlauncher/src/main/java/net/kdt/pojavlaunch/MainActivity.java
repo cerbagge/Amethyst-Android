@@ -23,6 +23,7 @@ import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.hardware.input.InputManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -96,6 +97,13 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     private GyroControl mGyroControl = null;
     private ControlLayout mControlLayout;
     private HotbarView mHotbarView;
+    private InputManager mInputManager;
+    private boolean mControlsHiddenByHardware = false;
+    private final InputManager.InputDeviceListener mInputDeviceListener = new InputManager.InputDeviceListener() {
+        @Override public void onInputDeviceAdded(int deviceId) { updateHardwareControlHiding(); }
+        @Override public void onInputDeviceChanged(int deviceId) { updateHardwareControlHiding(); }
+        @Override public void onInputDeviceRemoved(int deviceId) { updateHardwareControlHiding(); }
+    };
 
     MinecraftProfile minecraftProfile;
 
@@ -195,6 +203,8 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     protected void initLayout(int resId) {
         setContentView(resId);
         bindValues();
+        mInputManager = (InputManager) getSystemService(Context.INPUT_SERVICE);
+        if (mInputManager != null) mInputManager.registerInputDeviceListener(mInputDeviceListener, null);
         mControlLayout.setMenuListener(this);
 
         mDrawerPullButton.setOnClickListener(v -> onClickedMenu());
@@ -289,6 +299,31 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         }
         mDrawerPullButton.setVisibility(mControlLayout.hasMenuButton() ? View.GONE : View.VISIBLE);
         mControlLayout.toggleControlVisible();
+        updateHardwareControlHiding();
+    }
+
+    public void updateHardwareControlHiding() {
+        if (mControlLayout == null) return;
+        if (!LauncherPreferences.PREF_HIDE_CONTROLS_HARDWARE) {
+            if (mControlsHiddenByHardware) {
+                mControlsHiddenByHardware = false;
+                applyAllControlsVisible(true);
+            }
+            return;
+        }
+        boolean hardware = Tools.isHardwareInputConnected();
+        if (hardware && !mControlsHiddenByHardware) {
+            mControlsHiddenByHardware = true;
+            applyAllControlsVisible(false);
+        } else if (!hardware && mControlsHiddenByHardware) {
+            mControlsHiddenByHardware = false;
+            applyAllControlsVisible(true);
+        }
+    }
+
+    private void applyAllControlsVisible(boolean visible) {
+        mControlLayout.setControlVisible(visible);
+        if (!visible && touchpad != null) touchpad.disable();
     }
 
     @Override
@@ -322,6 +357,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         if(PREF_ENABLE_GYRO) mGyroControl.enable();
         CallbackBridge.nativeSetWindowAttrib(LwjglGlfwKeycode.GLFW_FOCUSED, 1);
         CallbackBridge.nativeSetWindowAttrib(LwjglGlfwKeycode.GLFW_HOVERED, 1);
+        updateHardwareControlHiding();
     }
 
     @Override
@@ -354,6 +390,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mInputManager != null) mInputManager.unregisterInputDeviceListener(mInputDeviceListener);
         CallbackBridge.removeGrabListener(touchpad);
         CallbackBridge.removeGrabListener(minecraftGLView);
         ContextExecutor.clearActivity();
