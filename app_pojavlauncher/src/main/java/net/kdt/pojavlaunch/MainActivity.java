@@ -304,26 +304,17 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
 
     public void updateHardwareControlHiding() {
         if (mControlLayout == null) return;
-        if (!LauncherPreferences.PREF_HIDE_CONTROLS_HARDWARE) {
-            if (mControlsHiddenByHardware) {
-                mControlsHiddenByHardware = false;
-                applyAllControlsVisible(true);
-            }
-            return;
+        // Level-triggered on purpose: loadControls()' toggleControlVisible() and layout
+        // reloads (exitEditor, onActivityResult) recreate buttons in a visible state, so
+        // hiding must be re-asserted on every evaluation, not only on state transitions.
+        boolean shouldHide = LauncherPreferences.PREF_HIDE_CONTROLS_HARDWARE
+                && Tools.isHardwareInputConnected();
+        if (shouldHide) {
+            mControlLayout.setControlVisible(false);
+        } else if (mControlsHiddenByHardware) {
+            mControlLayout.setControlVisible(true);
         }
-        boolean hardware = Tools.isHardwareInputConnected();
-        if (hardware && !mControlsHiddenByHardware) {
-            mControlsHiddenByHardware = true;
-            applyAllControlsVisible(false);
-        } else if (!hardware && mControlsHiddenByHardware) {
-            mControlsHiddenByHardware = false;
-            applyAllControlsVisible(true);
-        }
-    }
-
-    private void applyAllControlsVisible(boolean visible) {
-        mControlLayout.setControlVisible(visible);
-        if (!visible && touchpad != null) touchpad.disable();
+        mControlsHiddenByHardware = shouldHide;
     }
 
     @Override
@@ -436,6 +427,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            updateHardwareControlHiding();
         }
     }
 
@@ -683,6 +675,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         navDrawer.setAdapter(gameActionArrayAdapter);
         navDrawer.setOnItemClickListener(gameActionClickListener);
         isInEditor = false;
+        updateHardwareControlHiding();
     }
 
     @Override
