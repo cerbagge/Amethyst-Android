@@ -256,6 +256,19 @@ public class ControlLayout extends FrameLayout {
 		}
 	}
 
+	/**
+	 * Force visibility of the non-hideable special buttons (control toggle, virtual mouse).
+	 * ControlInterface.setVisible() ignores them by design, so hardware control hiding
+	 * has to bypass it to clear the whole screen.
+	 */
+	public void setNonHideableControlsVisible(boolean isVisible) {
+		if (mModifiable) return;
+		for(ControlInterface button : getButtonChildren()){
+			if (button.getProperties().isHideable) continue;
+			button.getControlView().setVisibility(isVisible ? VISIBLE : GONE);
+		}
+	}
+
 	public void setModifiable(boolean isModifiable) {
 		if(!isModifiable && mModifiable){
 			removeEditWindow();

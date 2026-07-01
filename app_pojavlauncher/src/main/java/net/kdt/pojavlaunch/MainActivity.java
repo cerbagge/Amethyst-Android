@@ -311,8 +311,10 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
                 && Tools.isHardwareInputConnected();
         if (shouldHide) {
             mControlLayout.setControlVisible(false);
+            mControlLayout.setNonHideableControlsVisible(false);
         } else if (mControlsHiddenByHardware) {
             mControlLayout.setControlVisible(true);
+            mControlLayout.setNonHideableControlsVisible(true);
         }
         mControlsHiddenByHardware = shouldHide;
     }
